@@ -33,6 +33,8 @@ Note.init({
   modelName: 'note'
 })
 
+Note.sync()
+
 app.get('/api/notes', async (req, res) => {
 
   const notes = await Note.findAll()
@@ -45,6 +47,15 @@ app.post('/api/notes', async (req, res) => {
     return res.json(note)
   } catch(error) {
     return res.status(400).json({ error })
+  }
+})
+
+app.get('/api/notes/:id', async (req, res) => {
+  const note = await Note.findByPk(req.params.id)
+  if (note) {
+    res.json(note)
+  } else {
+    res.status(404).end()
   }
 })
 
