@@ -1,0 +1,11 @@
+### POST request to create a new blog
+POST http://localhost:3001/api/blogs
+Content-Type: application/json
+
+{
+  "author": "Jane Doe",
+  "url": "http://example.com",
+  "title": "Learning REST with Sequelize",
+  "likes": 10
+}
+
