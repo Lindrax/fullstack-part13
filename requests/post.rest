@@ -4,9 +4,10 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RpIiwiaWQiOjEsImlhdCI6MTczNDk2ODIwMH0.yMM9-_Atj9rSr7GG7t3t1aEcEDrD3Py1rgNB9ok2-JQ
 
 {
-  "author": "Jane Doe",
+  "author": "toinen",
   "url": "http://example.com",
-  "title": "testing",
-  "likes": 5
+  "title": "idk",
+  "likes": 5,
+  "year": 1800
 }
 
