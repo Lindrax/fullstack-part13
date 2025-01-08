@@ -5,24 +5,8 @@ const { Op } = require('sequelize')
 const { Blog } = require('../models')
 const { User } = require('../models')
 
-const jwt = require('jsonwebtoken')
-const { SECRET } = require('../util/config')
+const {tokenExtractor, checkSession} = require('../util/middleware')
 
-const tokenExtractor = (req, res, next) => {
-  const authorization = req.get('authorization')
-  if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-    try {
-      console.log(authorization.substring(7))
-      req.decodedToken = jwt.verify(authorization.substring(7), SECRET)
-    } catch (error){
-      console.log(error)
-      return res.status(401).json({ error: 'token invalid' })
-    }
-  } else {
-    return res.status(401).json({ error: 'token missing' })
-  }
-  next()
-}
 
 const blogFinder = async(req, res, next) => {
   req.blog = await Blog.findByPk(req.params.id)
@@ -67,12 +51,19 @@ router.get('/', async (req, res) => {
 
 router.post('/', tokenExtractor, async (req, res) =>  {
     const user = await User.findByPk(req.decodedToken.id)
-    const blog = await Blog.create({...req.body, userId: user.id, date: new Date()})
-  res.json(blog)
+    if (await checkSession(req.decodedToken.id)) {
+      const blog = await Blog.create({...req.body, userId: user.id, date: new Date()})
+      res.json(blog)
+    } else {
+      res.json('you do not have an active sessions')
+    }
+    
+  
 })
 
 router.delete('/:id',blogFinder, tokenExtractor, async (req, res) => {
   if (req.blog) {
+    if (await checkSession(req.decodedToken.id)) {
     if (req.blog.userId === req.decodedToken.id) {
       req.blog.destroy()
       res.json(req.blog)
@@ -80,7 +71,10 @@ router.delete('/:id',blogFinder, tokenExtractor, async (req, res) => {
     else {
       return res.status(401).json({ error: 'Not your blog'})
     }
+  } else {
+    res.json('no active session')
   }
+}
   else {
     return res.status(404).json({ error: 'Blog not found' })
   }

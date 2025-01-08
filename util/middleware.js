@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const { SECRET } = require('../util/config')
+const Sessions = require('../models/sessions')
 
 
 const tokenExtractor = (req, res, next) => {
@@ -18,4 +19,16 @@ const tokenExtractor = (req, res, next) => {
   next()
 }
 
-module.exports = tokenExtractor
+const checkSession = async (id) => {
+  const token = await Sessions.findOne({where: {user_id: id}})
+  console.log('session',token)
+  if (token != null) {
+    console.log('tosi')
+    return true
+  } else {
+    console.log('ei')
+    return false
+  }
+}
+
+module.exports ={ tokenExtractor, checkSession}

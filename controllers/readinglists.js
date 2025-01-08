@@ -1,9 +1,9 @@
-router = require('express').Router()
+const router = require('express').Router()
 
 const { UserBlogs } = require('../models')
 const { User } = require('../models')
 
-const tokenExtractor = require('../util/middleware')
+const {tokenExtractor, checkSession} = require('../util/middleware')
 
 router.post('/', async (req, res) => {
   console.log(req.body.user_id)
@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
 
 router.put('/:id',tokenExtractor, async (req, res) => {
   //const user = await User.findByPk(req.decodedToken.id)
-  console.log
+  if (await checkSession(req.decodedToken.id)) {
   const blog = await UserBlogs.findOne({ where: {userId: req.decodedToken.id, blogId: req.params.id}})
   console.log(blog)
   if (blog != null) {
@@ -22,8 +22,10 @@ router.put('/:id',tokenExtractor, async (req, res) => {
     res.status(200).json(blog)
   } else {
     res.status(400).json('blog not found')
+  }}
+  else {
+    res.json('no active sessions')
   }
-
 })
 
 module.exports = router
